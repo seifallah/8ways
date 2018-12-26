@@ -16,5 +16,10 @@ Route::get('/', function () {
 });
 
 Route::get('/movies', 'MovieController@index');
+Route::get('/movies/sort/{sortby}', 'MovieController@sort');
 Route::get('/movies/{title}', 'MovieController@search');
-Route::get('/movie/{id}', 'MovieController@show');
+//Route::get('/movie/{id}', 'MovieController@show');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

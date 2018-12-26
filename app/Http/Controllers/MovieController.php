@@ -8,51 +8,74 @@ use GuzzleHttp\Client;
 
 class MovieController extends Controller
 {
+	protected $api_key;
+	protected $base_path;
+
+	public function __construct()
+    {
+        $this->api_key =  env("MOVIEDB_API_KEY", null);
+        $this->base_path =  env("MOVIEDB_HOST", null);
+    }
+
+
     // show all popular movies
     public function index()
     {
     	$client = new Client();
-		$result = $client->get('https://api.themoviedb.org/3/discover/movie', [
+		$result = $client->get($this->base_path.'discover/movie', [
 		    'form_params' => [
-		        'api_key' => '094b0c335ecdcb49d025af86261a6c76',
+		        'api_key' => $this->api_key,
 		        'sort_by' => 'popularity.desc'
 		    ]
 		]);
 
-		$popular_movies = $result->getBody();
-         return view('movies.list')->with('popular_movies', json_decode($popular_movies, true));
+		$movies = $result->getBody();
+         return view('movies.list')->with('movies', json_decode($movies, true));
     }
 
     // search movies by title
     public function search($title)
     {
     	$client = new Client();
-		$result = $client->get('https://api.themoviedb.org/3/search/movie', [
+		$result = $client->get($this->base_path.'search/movie', [
 		    'form_params' => [
-		        'api_key' => '094b0c335ecdcb49d025af86261a6c76',
+		        'api_key' => $this->api_key,
 		        'query' => $title
 		    ]
 		]);
 
-		$popular_movies = $result->getBody();
-         return view('movies.list')->with('popular_movies', json_decode($popular_movies, true));
+		$movies = $result->getBody();
+         return view('movies.list')->with('movies', json_decode($movies, true));
 
     
     }
 
-    // sort movies by title & rate
-    public function sort()
+    // sort movies by title & vote
+    public function sort($sortby)
     {
-        return view('welcome');
+        //if sort_by = title => original_title,
+        //sort_by = vote => vote_count
+    	$client = new Client();
+		$result = $client->get($this->base_path.'discover/movie', [
+		    'form_params' => [
+		        'api_key' => $this->api_key,
+		        'sort_by' => $sortby.'.desc'
+		    ]
+		]);
+
+		$movies = $result->getBody();
+         return view('movies.list')->with('movies', json_decode($movies, true));
     }
+
+
 
     // show movie details
     public function show($id)
     {
         $client = new Client();
-		$result = $client->get('https://api.themoviedb.org/3/find/'.$id, [
+		$result = $client->get($this->base_path.'find/'.$id, [
 		    'form_params' => [
-		        'api_key' => '094b0c335ecdcb49d025af86261a6c76',
+		        'api_key' => $this->api_key,
 		        'external_source' => 'imdb_id'
 		    ]
 		]);
