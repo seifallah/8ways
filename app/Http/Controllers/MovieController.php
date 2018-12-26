@@ -24,9 +24,20 @@ class MovieController extends Controller
     }
 
     // search movies by title
-    public function search()
+    public function search($title)
     {
-        return view('welcome');
+    	$client = new Client();
+		$result = $client->get('https://api.themoviedb.org/3/search/movie', [
+		    'form_params' => [
+		        'api_key' => '094b0c335ecdcb49d025af86261a6c76',
+		        'query' => $title
+		    ]
+		]);
+
+		$popular_movies = $result->getBody();
+         return view('movies.list')->with('popular_movies', json_decode($popular_movies, true));
+
+    
     }
 
     // sort movies by title & rate
@@ -36,8 +47,18 @@ class MovieController extends Controller
     }
 
     // show movie details
-    public function show()
+    public function show($id)
     {
-        return view('welcome');
+        $client = new Client();
+		$result = $client->get('https://api.themoviedb.org/3/find/'.$id, [
+		    'form_params' => [
+		        'api_key' => '094b0c335ecdcb49d025af86261a6c76',
+		        'external_source' => 'imdb_id'
+		    ]
+		]);
+
+		$popular_movies = $result->getBody();
+         return view('movies.list')->with('popular_movies', json_decode($popular_movies, true));
+
     }
 }
